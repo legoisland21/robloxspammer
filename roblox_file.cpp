@@ -123,6 +123,8 @@ int main() {
         }
     } else {
         for(const auto& l : lines) {
+            if(!isWindowFocused(hwnd)) focusRoblox(hwnd);
+            cout << "---------------------------------" << endl;
             cout << "Sending line: " << l << endl;
             sendMessage(l);
             Sleep(delay_ms);
