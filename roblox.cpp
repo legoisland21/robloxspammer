@@ -1,10 +1,15 @@
 #include "autocontroller.h"
+#include <windows.h>
 #include <iostream>
 using namespace std;
+
 string text;
 
-
 Controller control;
+
+bool isWindowFocused(HWND hwnd) {
+    return GetForegroundWindow() == hwnd;
+}
 
 void sendBackspace() {
     INPUT inputs[2] = {};
@@ -21,7 +26,6 @@ void sendBackspace() {
 
 void inputSlashScan() {
     INPUT input[2] = {};
-
     input[0].type = INPUT_KEYBOARD;
     input[0].ki.dwFlags = KEYEVENTF_SCANCODE;
     input[0].ki.wScan = 0x35;
@@ -35,7 +39,6 @@ void inputSlashScan() {
 
 void inputEnterScan() {
     INPUT input[2] = {};
-
     input[0].type = INPUT_KEYBOARD;
     input[0].ki.dwFlags = KEYEVENTF_SCANCODE;
     input[0].ki.wScan = 0x1C;
@@ -60,22 +63,31 @@ void sendMessage(const string& text) {
     for(int i = 0; i != 10; i++) { inputEnterScan(); Sleep(10); }
 }
 
+void focusRoblox(HWND hwnd) {
+    SetForegroundWindow(hwnd);
+    SetFocus(hwnd);
+}
+
 int main() {
     HWND hwnd = FindWindowA(NULL, "Roblox");
-    if(hwnd) {
-        cout << "Enter text: ";
-        getline(cin, text);
-        cout << endl;
-        printf("HWND id is %p \n", hwnd);
-        cout << "Setting Roblox as foreground window" << endl;
-        SetForegroundWindow(hwnd);
-        cout << "Focusing Roblox" << endl;
-        SetFocus(hwnd);
-        cout << "Typing " << text << endl;
-        sendMessage(text);
-    } else {
+    if (!hwnd) {
         MessageBoxA(NULL, "Could not find Roblox, is Roblox running?", "ERROR", MB_ICONERROR);
         return 1;
     }
+
+    cout << "Enter text: ";
+    getline(cin, text);
+    cout << endl;
+
+    printf("HWND id is %p \n", hwnd);
+    cout << "Setting Roblox as foreground window" << endl;
+    SetForegroundWindow(hwnd);
+    SetFocus(hwnd);
+    cout << "Typing " << text << endl;
+
+    MSG msg = {0};
+    if(!isWindowFocused(hwnd)) focusRoblox(hwnd);
+    sendMessage(text);
+
     return 0;
 }
