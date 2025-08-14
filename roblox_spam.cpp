@@ -1,7 +1,12 @@
 #include "autocontroller.h"
 #include <iostream>
 using namespace std;
+
 Controller control;
+
+bool isWindowFocused(HWND hwnd) {
+    return GetForegroundWindow() == hwnd;
+}
 
 void sendBackspace() {
     INPUT inputs[2] = {};
@@ -57,6 +62,11 @@ void sendMessage(const string& text) {
     for(int i = 0; i != 10; i++) { inputEnterScan(); Sleep(10); }
 }
 
+void focusRoblox(HWND hwnd) {
+    SetForegroundWindow(hwnd);
+    SetFocus(hwnd);
+}
+
 int main() {
     string text;
     int delay;
@@ -75,6 +85,8 @@ int main() {
         SetFocus(hwnd);
         cout << "Typing " << text << endl;
         while(true) {
+            if(!isWindowFocused(hwnd)) focusRoblox(hwnd);
+            cout << "---------------------------------" << endl;
             sendMessage(text);
             Sleep(delay);
         }

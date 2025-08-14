@@ -7,6 +7,10 @@ using namespace std;
 
 Controller control;
 
+bool isWindowFocused(HWND hwnd) {
+    return GetForegroundWindow() == hwnd;
+}
+
 void sendBackspace() {
     INPUT inputs[2] = {};
     inputs[0].type = INPUT_KEYBOARD;
@@ -61,6 +65,11 @@ void sendMessage(const string& text) {
     for(int i = 0; i != 10; i++) { inputEnterScan(); Sleep(10); }
 }
 
+void focusRoblox(HWND hwnd) {
+    SetForegroundWindow(hwnd);
+    SetFocus(hwnd);
+}
+
 int main() {
     string filename;
     bool repeat;
@@ -105,6 +114,8 @@ int main() {
         cout << "Repeating entire file..." << endl;
         while(true) {
             for(const auto& l : lines) {
+                if(!isWindowFocused(hwnd)) focusRoblox(hwnd);
+                cout << "---------------------------------" << endl;
                 cout << "Sending line: " << l << endl;
                 sendMessage(l);
                 Sleep(delay_ms);

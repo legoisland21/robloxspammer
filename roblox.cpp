@@ -1,6 +1,7 @@
 #include "autocontroller.h"
 #include <iostream>
 using namespace std;
+
 Controller control;
 
 void sendBackspace() {
