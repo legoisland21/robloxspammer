@@ -97,6 +97,14 @@ public:
         }
 
         SendInput(1, &input, sizeof(INPUT));
+    } 
+
+    void scrollVertical(int amount) {
+        INPUT input = {};
+        input.type = INPUT_MOUSE;
+        input.mi.mouseData = amount * WHEEL_DELTA;
+        input.mi.dwFlags = MOUSEEVENTF_WHEEL;
+        SendInput(1, &input, sizeof(INPUT));
     } // Mouse
 
     // Keyboard
@@ -167,11 +175,19 @@ public:
         SendInput(1, &input, sizeof(INPUT));
     }
 
-    void scrollVertical(int amount) {
+    void sendRawKeyDown(WORD scanCode) {
         INPUT input = {};
-        input.type = INPUT_MOUSE;
-        input.mi.mouseData = amount * WHEEL_DELTA;
-        input.mi.dwFlags = MOUSEEVENTF_WHEEL;
+        input.type = INPUT_KEYBOARD;
+        input.ki.wScan = scanCode;
+        input.ki.dwFlags = KEYEVENTF_SCANCODE;
         SendInput(1, &input, sizeof(INPUT));
     }
+
+    void sendKeyUp(WORD scanCode) {
+        INPUT input = {};
+        input.type = INPUT_KEYBOARD;
+        input.ki.wScan = scanCode;
+        input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+        SendInput(1, &input, sizeof(INPUT));
+    } // Keyboard
 };
