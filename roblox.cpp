@@ -1,6 +1,8 @@
 #include "autocontroller.h"
 #include <iostream>
 using namespace std;
+string text;
+
 
 Controller control;
 
@@ -59,13 +61,11 @@ void sendMessage(const string& text) {
 }
 
 int main() {
-    string text;
-    cout << "Enter text: ";
-    getline(cin, text);
-    cout << endl;
-
     HWND hwnd = FindWindowA(NULL, "Roblox");
     if(hwnd) {
+        cout << "Enter text: ";
+        getline(cin, text);
+        cout << endl;
         printf("HWND id is %p \n", hwnd);
         cout << "Setting Roblox as foreground window" << endl;
         SetForegroundWindow(hwnd);

@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 using namespace std;
+string filename;
+bool repeat;
+vector<string> lines;
+string line;
 
 Controller control;
 
@@ -71,8 +75,11 @@ void focusRoblox(HWND hwnd) {
 }
 
 int main() {
-    string filename;
-    bool repeat;
+    HWND hwnd = FindWindowA(NULL, "Roblox");
+    if (!hwnd) {
+        cerr << "Could not find Roblox, is Roblox running?" << endl;
+        return 1;
+    }
     cout << "Enter filename to load lines from: ";
     getline(cin, filename);
 
@@ -82,8 +89,6 @@ int main() {
         return 1;
     }
 
-    vector<string> lines;
-    string line;
     while(getline(file, line)) {
         if(!line.empty()) lines.push_back(line);
     }
@@ -97,12 +102,6 @@ int main() {
     cout << "Repeat file? (true/false): ";
     cin >> repeat;
     cin.ignore();
-
-    HWND hwnd = FindWindowA(NULL, "Roblox");
-    if (!hwnd) {
-        cerr << "Could not find Roblox, is Roblox running?" << endl;
-        return 1;
-    }
 
     printf("HWND id is %p \n", hwnd);
     cout << "Setting Roblox as foreground window" << endl;

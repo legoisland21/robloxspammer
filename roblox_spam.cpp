@@ -1,6 +1,8 @@
 #include "autocontroller.h"
 #include <iostream>
 using namespace std;
+string text;
+int delay;
 
 Controller control;
 
@@ -68,16 +70,13 @@ void focusRoblox(HWND hwnd) {
 }
 
 int main() {
-    string text;
-    int delay;
-    cout << "Enter text: ";
-    getline(cin, text);
-    cout << "Enter delay: ";
-    cin >> delay;
-    cout << endl;
-
     HWND hwnd = FindWindowA(NULL, "Roblox");
     if(hwnd) {
+        cout << "Enter text: ";
+        getline(cin, text);
+        cout << "Enter delay: ";
+        cin >> delay;
+        cout << endl;
         printf("HWND id is %p \n", hwnd);
         cout << "Setting Roblox as foreground window" << endl;
         SetForegroundWindow(hwnd);
