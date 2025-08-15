@@ -1,11 +1,7 @@
 #include "autocontroller.h"
 #include <iostream>
 #include <fstream>
-#include <string>
 #include <vector>
-#include <thread>
-#include <atomic>
-#include <windows.h>
 using namespace std;
 
 string filename;
@@ -14,52 +10,22 @@ vector<string> lines;
 string line;
 
 Controller control;
-atomic<bool> running(true);
 
 bool isWindowFocused(HWND hwnd) {
     return GetForegroundWindow() == hwnd;
 }
 
-void sendBackspace() {
-    INPUT inputs[2] = {};
-    inputs[0].type = INPUT_KEYBOARD;
-    inputs[0].ki.wScan = 0x0E;
-    inputs[0].ki.dwFlags = KEYEVENTF_SCANCODE;
-    inputs[1].type = INPUT_KEYBOARD;
-    inputs[1].ki.wScan = 0x0E;
-    inputs[1].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-    SendInput(2, inputs, sizeof(INPUT));
-}
-
-void inputSlashScan() {
-    INPUT input[2] = {};
-    input[0].type = INPUT_KEYBOARD;
-    input[0].ki.dwFlags = KEYEVENTF_SCANCODE;
-    input[0].ki.wScan = 0x35;
-    input[1].type = INPUT_KEYBOARD;
-    input[1].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-    input[1].ki.wScan = 0x35;
-    SendInput(2, input, sizeof(INPUT));
-}
-
-void inputEnterScan() {
-    INPUT input[2] = {};
-    input[0].type = INPUT_KEYBOARD;
-    input[0].ki.dwFlags = KEYEVENTF_SCANCODE;
-    input[0].ki.wScan = 0x1C;
-    input[1].type = INPUT_KEYBOARD;
-    input[1].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-    input[1].ki.wScan = 0x1C;
-    SendInput(2, input, sizeof(INPUT));
-}
-
 void sendMessage(const string& text) {
-    inputSlashScan();
+    cout << "Pressing /" << endl;
+    control.inputScan(0x35);
     Sleep(100);
-    sendBackspace();
+    cout << "Clearing chat" << endl;
+    control.inputScan(0x0E);
+    cout << "Typing string: " << text << endl;
     control.typeString(text, 0);
     Sleep(10);
-    for(int i = 0; i != 10; i++) { inputEnterScan(); Sleep(10); }
+    cout << "Pressing enter (x10)" << endl;
+    for(int i = 0; i != 10; i++) { control.inputScan(0x1C); Sleep(10); }
 }
 
 void focusRoblox(HWND hwnd) {
@@ -67,29 +33,10 @@ void focusRoblox(HWND hwnd) {
     SetFocus(hwnd);
 }
 
-void hotkeyListener() {
-    RegisterHotKey(NULL, 1, MOD_ALT, 0x51);
-    MSG msg = {};
-    while (running) {
-        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-            if (msg.message == WM_HOTKEY && msg.wParam == 1) {
-                running = false;
-                return;
-            }
-        }
-        this_thread::sleep_for(chrono::milliseconds(50));
-    }
-    UnregisterHotKey(NULL, 1);
-}
-
 int main() {
-    thread hotkeyThread(hotkeyListener);
-
     HWND hwnd = FindWindowA(NULL, "Roblox");
     if (!hwnd) {
         cerr << "Could not find Roblox, is Roblox running?" << endl;
-        running = false;
-        hotkeyThread.join();
         return 1;
     }
 
@@ -99,8 +46,6 @@ int main() {
     ifstream file(filename);
     if (!file.is_open()) {
         cerr << "Can't open file: " << filename << endl;
-        running = false;
-        hotkeyThread.join();
         return 1;
     }
 
@@ -122,9 +67,8 @@ int main() {
     SetFocus(hwnd);
 
     if(repeat) {
-        while(running) {
+        while(true) {
             for(const auto& l : lines) {
-                if(!running) break;
                 if(!isWindowFocused(hwnd)) focusRoblox(hwnd);
                 sendMessage(l);
                 Sleep(delay_ms);
@@ -132,14 +76,10 @@ int main() {
         }
     } else {
         for(const auto& l : lines) {
-            if(!running) break;
             if(!isWindowFocused(hwnd)) focusRoblox(hwnd);
             sendMessage(l);
             Sleep(delay_ms);
         }
     }
-
-    running = false;
-    hotkeyThread.join();
     return 0;
 }

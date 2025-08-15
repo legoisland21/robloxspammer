@@ -11,56 +11,17 @@ bool isWindowFocused(HWND hwnd) {
     return GetForegroundWindow() == hwnd;
 }
 
-void sendBackspace() {
-    INPUT inputs[2] = {};
-    inputs[0].type = INPUT_KEYBOARD;
-    inputs[0].ki.wScan = 0x0E;
-    inputs[0].ki.dwFlags = KEYEVENTF_SCANCODE;
-
-    inputs[1].type = INPUT_KEYBOARD;
-    inputs[1].ki.wScan = 0x0E;
-    inputs[1].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-
-    SendInput(2, inputs, sizeof(INPUT));
-}
-
-void inputSlashScan() {
-    INPUT input[2] = {};
-    input[0].type = INPUT_KEYBOARD;
-    input[0].ki.dwFlags = KEYEVENTF_SCANCODE;
-    input[0].ki.wScan = 0x35;
-
-    input[1].type = INPUT_KEYBOARD;
-    input[1].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-    input[1].ki.wScan = 0x35;
-
-    SendInput(2, input, sizeof(INPUT));
-}
-
-void inputEnterScan() {
-    INPUT input[2] = {};
-    input[0].type = INPUT_KEYBOARD;
-    input[0].ki.dwFlags = KEYEVENTF_SCANCODE;
-    input[0].ki.wScan = 0x1C;
-
-    input[1].type = INPUT_KEYBOARD;
-    input[1].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
-    input[1].ki.wScan = 0x1C;
-
-    SendInput(2, input, sizeof(INPUT));
-}
-
 void sendMessage(const string& text) {
     cout << "Pressing /" << endl;
-    inputSlashScan();
+    control.inputScan(0x35);
     Sleep(100);
     cout << "Clearing chat" << endl;
-    sendBackspace();
+    control.inputScan(0x0E);
     cout << "Typing string: " << text << endl;
     control.typeString(text, 0);
     Sleep(10);
     cout << "Pressing enter (x10)" << endl;
-    for(int i = 0; i != 10; i++) { inputEnterScan(); Sleep(10); }
+    for(int i = 0; i != 10; i++) { control.inputScan(0x1C); Sleep(10); }
 }
 
 void focusRoblox(HWND hwnd) {

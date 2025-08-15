@@ -183,11 +183,22 @@ public:
         SendInput(1, &input, sizeof(INPUT));
     }
 
-    void sendKeyUp(WORD scanCode) {
+    void sendRawKeyUp(WORD scanCode) {
         INPUT input = {};
         input.type = INPUT_KEYBOARD;
         input.ki.wScan = scanCode;
         input.ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
         SendInput(1, &input, sizeof(INPUT));
+    }
+
+    void inputScan(WORD scancode) {
+        INPUT input[2] = {};
+        input[0].type = INPUT_KEYBOARD;
+        input[0].ki.dwFlags = KEYEVENTF_SCANCODE;
+        input[0].ki.wScan = scancode;
+        input[1].type = INPUT_KEYBOARD;
+        input[1].ki.dwFlags = KEYEVENTF_SCANCODE | KEYEVENTF_KEYUP;
+        input[1].ki.wScan = scancode;
+        SendInput(2, input, sizeof(INPUT));
     } // Keyboard
 };
